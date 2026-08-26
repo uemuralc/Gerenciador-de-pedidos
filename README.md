@@ -1,4 +1,4 @@
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/a5347f6c-c71a-4f53-913f-d6fb81d06f24" />
+<img width="1919" height="1029" alt="image" src="https://github.com/user-attachments/assets/97ca24d2-2427-4b60-9dce-634edddb6ed5" />
 
 
 # 📦 Painel de Gestão - Pedidos e Estoque
