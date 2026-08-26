@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Gestão</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div id="toast"></div>
+
+    <!-- MODAL SENHA -->
+    <div id="modalSenha" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin-top: 0;">🔒 Área Restrita</h3>
+            <input type="password" id="inputSenha" placeholder="Senha..." style="margin-bottom: 20px;" onkeypress="if(event.key === 'Enter') verificarSenha()">
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn-cancelar" onclick="fecharModalSenha()" style="margin: 0;">Cancelar</button>
+                <button onclick="verificarSenha()" style="margin: 0;">Entrar</button>
+            </div>
+            <p id="msgErro" style="color: red; display: none; font-weight: bold; margin-top: 15px;">❌ Senha incorreta!</p>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR PEDIDO -->
+    <div id="modalEditar" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin-top: 0; margin-bottom: 20px;">✏️ Editar Pedido</h3>
+            <label>Nome do Cliente:</label>
+            <input type="text" id="editCliente" style="margin-bottom: 10px;" onkeypress="if(event.key === 'Enter') salvarEdicaoPedido()">
+            <label>Produto/Item:</label>
+            <input type="text" id="editItem" style="margin-bottom: 10px;" onkeypress="if(event.key === 'Enter') salvarEdicaoPedido()">
+            <label>Valor Total (R$):</label>
+            <input type="number" id="editTotal" min="0" style="margin-bottom: 25px;" onkeypress="if(event.key === 'Enter') salvarEdicaoPedido()">
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn-cancelar" onclick="fecharModalEditar()" style="margin: 0;">Cancelar</button>
+                <button onclick="salvarEdicaoPedido()" style="margin: 0;">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR ESTOQUE -->
+    <div id="modalEditarEstoque" class="modal-overlay">
+        <div class="modal-content">
+            <h3 style="margin-top: 0; margin-bottom: 20px;">✏️ Editar Material</h3>
+            <label>Nome do Material:</label>
+            <input type="text" id="editMaterialNome" style="margin-bottom: 10px;" onkeypress="if(event.key === 'Enter') salvarEdicaoEstoque()">
+            <label>Quantidade:</label>
+            <input type="number" id="editMaterialQtd" min="0" step="0.1" style="margin-bottom: 10px;" onkeypress="if(event.key === 'Enter') salvarEdicaoEstoque()">
+            <label>Unidade de Medida:</label>
+            <select id="editMaterialUnidade" style="margin-bottom: 25px;" onkeypress="if(event.key === 'Enter') salvarEdicaoEstoque()">
+                <option value="Unidades">Unidades</option>
+                <option value="Metros">Metros</option>
+                <option value="Kg">Quilos (Kg)</option>
+                <option value="Litros">Litros</option>
+            </select>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button class="btn-cancelar" onclick="fecharModalEditarEstoque()" style="margin: 0;">Cancelar</button>
+                <button onclick="salvarEdicaoEstoque()" style="margin: 0;">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- NAVEGAÇÃO -->
+        <div class="navbar">
+            <button id="btnNovoPedido" class="nav-btn ativo" onclick="mudarAba('novoPedido')">➕ Novo Pedido</button>
+            <button id="btnFilaPedidos" class="nav-btn" onclick="solicitarAba('filaPedidos')">📋 Fila de Pedidos</button>
+            <button id="btnEstoque" class="nav-btn" onclick="solicitarAba('estoque')">🛠️ Estoque</button>
+        </div>
+
+        <!-- TELA 1: NOVO PEDIDO -->
+        <div id="secaoNovoPedido">
+            <h1>Novo Pedido</h1>
+            <div class="form-group"><label>Nome do Cliente:</label><input type="text" id="clienteNome" placeholder="Ex: João Silva" onkeypress="if(event.key === 'Enter') adicionarPedido()"></div>
+            <div class="form-group"><label>Produto/Item Final:</label><input type="text" id="itemPedido" placeholder="Ex: Mesa de Madeira" onkeypress="if(event.key === 'Enter') adicionarPedido()"></div>
+            <div class="form-group"><label>Valor Total (R$):</label><input type="number" id="valorTotal" placeholder="Ex: 850.00" min="0" onkeypress="if(event.key === 'Enter') adicionarPedido()"></div>
+            <button onclick="adicionarPedido()">Cadastrar Pedido</button>
+        </div>
+
+        <!-- TELA 2: FILA -->
+        <div id="secaoFilaPedidos">
+            <div id="conteudoFila">
+                <h2>Fila Geral de Pedidos</h2>
+                
+                <!-- Nova linha com barra de busca e botão de exportar lado a lado -->
+                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                    <input type="text" id="buscaPedidos" class="barra-busca" placeholder="🔍 Pesquisar por nome do cliente ou item..." onkeyup="filtrarTabela('buscaPedidos', 'tabelaPedidos')" style="flex: 1;">
+                    <button onclick="exportarPedidos()" style="margin-top: 5px; background-color: #17a2b8;">📊 Exportar Excel</button>
+                </div>
+
+                <table>
+                    <thead><tr><th>ID</th><th>Cliente</th><th>Descrição</th><th>Status</th><th>Total</th><th>Ações</th></tr></thead>
+                    <tbody id="tabelaPedidos"></tbody>
+                </table>
+            </div>
+            
+            <!-- PERFIL -->
+            <div id="secaoPerfil">
+                <h2 id="tituloPerfil">Perfil do Cliente</h2>
+                <p><strong>Total gasto:</strong> <span id="totalGasto" style="color: green; font-weight: bold; font-size: 18px;"></span></p>
+                <button class="btn-voltar" onclick="fecharPerfil()">⬅ Voltar para a Fila</button>
+                <table>
+                    <thead><tr><th>ID</th><th>Descrição</th><th>Status</th><th>Valor</th></tr></thead>
+                    <tbody id="tabelaPerfil"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TELA 3: ESTOQUE -->
+        <div id="secaoEstoque">
+            <h1>Gestão de Matéria-Prima</h1>
+            <div class="form-group"><label>Material:</label><input type="text" id="materialNome" placeholder="Ex: Tecido..." onkeypress="if(event.key === 'Enter') adicionarEstoque()"></div>
+            <div style="display: flex; gap: 15px;">
+                <div class="form-group" style="flex: 1;"><label>Quantidade:</label><input type="number" id="materialQtd" step="0.1" min="0" onkeypress="if(event.key === 'Enter') adicionarEstoque()"></div>
+                <div class="form-group" style="flex: 1;"><label>Unidade:</label>
+                    <select id="materialUnidade" onkeypress="if(event.key === 'Enter') adicionarEstoque()"><option>Unidades</option><option>Metros</option><option>Kg</option><option>Litros</option></select>
+                </div>
+            </div>
+            <button onclick="adicionarEstoque()">Adicionar ao Estoque</button>
+
+            <h2>Materiais Disponíveis</h2>
+            
+            <!-- Nova linha com barra de busca e botão de exportar lado a lado -->
+            <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <input type="text" id="buscaEstoque" class="barra-busca" placeholder="🔍 Pesquisar material..." onkeyup="filtrarTabela('buscaEstoque', 'tabelaEstoque')" style="flex: 1;">
+                <button onclick="exportarEstoque()" style="margin-top: 5px; background-color: #17a2b8;">📊 Exportar Excel</button>
+            </div>
+
+            <table>
+                <thead><tr><th>ID</th><th>Material</th><th>Qtd.</th><th>Unidade</th><th>Ações</th></tr></thead>
+                <tbody id="tabelaEstoque"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
