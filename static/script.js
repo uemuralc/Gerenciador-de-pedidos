@@ -3,6 +3,20 @@ let abaPendente = '';
 let pedidoEditandoId = null;
 let materialEditandoId = null;
 
+// --- SISTEMA DE SEGURANÇA FRONTEND (Anti-XSS) ---
+function escaparHTML(texto) {
+    if (texto === null || texto === undefined) return '';
+    const mapa = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    };
+    return String(texto).replace(/[&<>"']/g, function(m) { return mapa[m]; });
+}
+
+// --- UTILITÁRIOS ---
 function mostrarToast(mensagem, tipo = 'sucesso') {
     const toast = document.getElementById("toast");
     toast.innerText = mensagem;
@@ -19,7 +33,7 @@ function filtrarTabela(inputId, tabelaId) {
     }
 }
 
-// --- SISTEMA DE SENHAS ---
+// --- SISTEMA DE SENHAS E NAVEGAÇÃO ---
 function solicitarAba(abaDestino) {
     abaPendente = abaDestino;
     document.getElementById('modalSenha').style.display = 'flex';
@@ -43,6 +57,10 @@ async function verificarSenha() {
             fecharModalSenha();
             executarMudancaAba(abaPendente);
             mostrarToast(resultado.mensagem, 'sucesso');
+            
+            // Carrega os dados após a permissão ser concedida pelo servidor!
+            carregarPedidos();
+            carregarEstoque();
         } else {
             document.getElementById('msgErro').style.display = 'block';
         }
@@ -96,8 +114,8 @@ async function carregarPedidos() {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${p.id}</td>
-            <td class="link-cliente" data-acao="perfil">${p.cliente}</td>
-            <td>${p.item || 'N/A'}</td>
+            <td class="link-cliente" data-acao="perfil">${escaparHTML(p.cliente)}</td>
+            <td>${escaparHTML(p.item) || 'N/A'}</td>
             <td style="color: ${corStatus}; font-weight: bold;">${p.status}</td>
             <td>R$ ${p.total.toFixed(2)}</td>
             <td>
@@ -107,7 +125,6 @@ async function carregarPedidos() {
             </td>
         `;
 
-        // Referências seguras (evita problemas com aspas em nomes com apóstrofo)
         tr.querySelector('.link-cliente').addEventListener('click', () => abrirPerfil(p.cliente));
         const btnStatus = tr.querySelector('[data-acao="iniciar"], [data-acao="finalizar"]');
         if (btnStatus) {
@@ -216,7 +233,7 @@ function abrirPerfil(nomeCliente) {
         somaTotal += p.total;
         let corStatus = p.status === 'Em andamento' ? '#17a2b8' : (p.status === 'Finalizado' ? 'green' : 'orange');
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${p.id}</td><td>${p.item || 'N/A'}</td><td style="color: ${corStatus}; font-weight: bold;">${p.status}</td><td>R$ ${p.total.toFixed(2)}</td>`;
+        tr.innerHTML = `<td>${p.id}</td><td>${escaparHTML(p.item) || 'N/A'}</td><td style="color: ${corStatus}; font-weight: bold;">${p.status}</td><td>R$ ${p.total.toFixed(2)}</td>`;
         tbodyPerfil.appendChild(tr);
     });
     document.getElementById('totalGasto').innerText = `R$ ${somaTotal.toFixed(2)}`;
@@ -243,13 +260,13 @@ async function carregarEstoque() {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${mat.id}</td>
-            <td>${mat.nome}</td>
+            <td>${escaparHTML(mat.nome)}</td>
             <td style="color: ${corQtd}; font-weight: bold;">
                 <button class="btn-qtd" data-acao="menos">-</button>
                 ${mat.quantidade}
                 <button class="btn-qtd" data-acao="mais">+</button>
             </td>
-            <td>${mat.unidade}</td>
+            <td>${escaparHTML(mat.unidade)}</td>
             <td>
                 <button class="btn-acao bg-editar" data-acao="editar" title="Editar">✏️</button>
                 <button class="btn-acao bg-deletar" data-acao="deletar" title="Excluir Material">🗑️</button>
@@ -345,7 +362,10 @@ async function deletarEstoque(id_material) {
     }
 }
 
-window.onload = () => { carregarPedidos(); carregarEstoque(); };
+// --- CARREGAMENTO INICIAL ---
+window.onload = () => { 
+    // Vazio propositalmente. O carregamento ocorre após a senha.
+};
 
 // --- SISTEMA DE EXPORTAÇÃO NATIVO (Janela do Windows) ---
 async function exportarPedidos() {
