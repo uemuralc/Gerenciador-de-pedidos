@@ -90,3 +90,23 @@ button[onclick*="exportar"]:hover {
         padding: 20px;
     }
 }
+
+/* --- CORREÇÃO DO MENU NO CELULAR --- */
+@media (max-width: 768px) {
+    .navbar {
+        display: flex;
+        flex-wrap: wrap; /* Permite que os botões quebrem linha se faltar espaço */
+        gap: 8px;
+        justify-content: center;
+        padding: 10px;
+    }
+
+    .nav-btn {
+        flex: 1 1 30%; /* Faz os botões dividirem o espaço de forma inteligente */
+        min-width: 90px;
+        font-size: 13px;
+        padding: 8px 4px;
+        text-align: center;
+        margin: 0 !important;
+    }
+}
