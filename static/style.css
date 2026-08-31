@@ -57,3 +57,36 @@ button[onclick*="exportar"] {
 button[onclick*="exportar"]:hover {
     background-color: #138496 !important;
 }
+
+/* --- ADAPTAÇÃO PARA CELULAR (RESPONSIVIDADE) --- */
+@media (max-width: 768px) {
+    body { 
+        padding: 10px; 
+    }
+    .container { 
+        padding: 15px; 
+    }
+    
+    /* Empilha os botões do menu no celular */
+    .navbar { 
+        flex-direction: column; 
+        gap: 5px;
+    }
+    .nav-btn { 
+        width: 100%; 
+        margin-bottom: 5px; 
+    }
+    
+    /* Permite rolar a tabela para o lado com o dedo */
+    table { 
+        display: block; 
+        overflow-x: auto; 
+        white-space: nowrap; 
+    }
+    
+    /* Ajusta modais para telas pequenas */
+    .modal-content {
+        width: 90%;
+        padding: 20px;
+    }
+}
