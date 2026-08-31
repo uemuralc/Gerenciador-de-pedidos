@@ -50,7 +50,6 @@ th { background-color: #f8f9fa; }
 .toast-sucesso { background-color: #28a745 !important; }
 .toast-erro { background-color: #dc3545 !important; }
 
-/* Botão de Exportar Excel e seu efeito de hover */
 button[onclick*="exportar"] {
     background-color: #17a2b8 !important;
 }

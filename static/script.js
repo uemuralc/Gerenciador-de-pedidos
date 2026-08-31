@@ -1,8 +1,3 @@
-let todosOsPedidos = [];
-let abaPendente = '';
-let pedidoEditandoId = null;
-let materialEditandoId = null;
-
 // --- SISTEMA DE SEGURANÇA FRONTEND (Anti-XSS) ---
 function escaparHTML(texto) {
     if (texto === null || texto === undefined) return '';
@@ -34,6 +29,11 @@ function filtrarTabela(inputId, tabelaId) {
 }
 
 // --- SISTEMA DE SENHAS E NAVEGAÇÃO ---
+let todosOsPedidos = [];
+let abaPendente = '';
+let pedidoEditandoId = null;
+let materialEditandoId = null;
+
 function solicitarAba(abaDestino) {
     abaPendente = abaDestino;
     document.getElementById('modalSenha').style.display = 'flex';
@@ -58,7 +58,6 @@ async function verificarSenha() {
             executarMudancaAba(abaPendente);
             mostrarToast(resultado.mensagem, 'sucesso');
             
-            // Carrega os dados após a permissão ser concedida pelo servidor!
             carregarPedidos();
             carregarEstoque();
         } else {
@@ -73,8 +72,14 @@ function fecharModalSenha() { document.getElementById('modalSenha').style.displa
 function mudarAba(abaDestino) { executarMudancaAba(abaDestino); }
 
 function executarMudancaAba(abaDestino) {
-    ['secaoNovoPedido', 'secaoFilaPedidos', 'secaoEstoque'].forEach(id => document.getElementById(id).style.display = 'none');
-    ['btnNovoPedido', 'btnFilaPedidos', 'btnEstoque'].forEach(id => document.getElementById(id).classList.remove('ativo'));
+    ['secaoNovoPedido', 'secaoFilaPedidos', 'secaoEstoque'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
+    ['btnNovoPedido', 'btnFilaPedidos', 'btnEstoque'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('ativo');
+    });
 
     if (abaDestino === 'novoPedido') {
         document.getElementById('secaoNovoPedido').style.display = 'block';
@@ -367,21 +372,56 @@ window.onload = () => {
     // Vazio propositalmente. O carregamento ocorre após a senha.
 };
 
-// --- SISTEMA DE EXPORTAÇÃO NATIVO (Janela do Windows) ---
+// --- SISTEMA DE EXPORTAÇÃO WEB (Gerador de CSV) ---
+function exportarParaCSV(dados, nomeArquivo) {
+    if (!dados || dados.length === 0) {
+        mostrarToast("Não há dados para exportar", "erro");
+        return;
+    }
+
+    const cabecalhos = Object.keys(dados[0]);
+    
+    const linhasCSV = [
+        cabecalhos.join(';'),
+        ...dados.map(item => cabecalhos.map(cabecalho => {
+            let valor = item[cabecalho];
+            if (typeof valor === 'string') {
+                valor = valor.replace(/\n/g, ' ').replace(/"/g, '""');
+                return `"${valor}"`;
+            }
+            return valor;
+        }).join(';'))
+    ].join('\n');
+
+    const blob = new Blob(["\ufeff" + linhasCSV], { type: 'text/csv;charset=utf-8;' }); 
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', nomeArquivo + '.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    mostrarToast("Exportação concluída com sucesso!", "sucesso");
+}
+
 async function exportarPedidos() {
-    let resultado = await window.pywebview.api.exportar_pedidos_nativ();
-    if (resultado.sucesso) {
-        mostrarToast(resultado.msg, 'sucesso');
-    } else if (resultado.msg !== "Cancelado") {
-        mostrarToast("Erro ao exportar", 'erro');
+    try {
+        const resposta = await fetch('/api/pedidos');
+        const dados = await resposta.json();
+        exportarParaCSV(dados, 'Relatorio_Pedidos');
+    } catch (e) {
+        mostrarToast("Erro ao conectar para exportar", "erro");
     }
 }
 
 async function exportarEstoque() {
-    let resultado = await window.pywebview.api.exportar_estoque_nativ();
-    if (resultado.sucesso) {
-        mostrarToast(resultado.msg, 'sucesso');
-    } else if (resultado.msg !== "Cancelado") {
-        mostrarToast("Erro ao exportar", 'erro');
+    try {
+        const resposta = await fetch('/api/estoque');
+        const dados = await resposta.json();
+        exportarParaCSV(dados, 'Relatorio_Estoque');
+    } catch (e) {
+        mostrarToast("Erro ao conectar para exportar", "erro");
     }
 }

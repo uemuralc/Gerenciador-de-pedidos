@@ -1,17 +1,37 @@
-import sqlite3
-import os
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_NAME = os.path.join(BASE_DIR, 'banco_de_dados.db')
-
-def iniciar_banco():
-    with sqlite3.connect(DB_NAME) as conn:
-        cursor = conn.cursor()
-        cursor.execute('''CREATE TABLE IF NOT EXISTS pedidos (id INTEGER PRIMARY KEY, cliente TEXT NOT NULL, item TEXT, status TEXT NOT NULL, total REAL NOT NULL)''')
-        cursor.execute('''CREATE TABLE IF NOT EXISTS estoque (id INTEGER PRIMARY KEY, nome TEXT NOT NULL, quantidade REAL NOT NULL, unidade TEXT NOT NULL)''')
-        conn.commit()
+DB_URL = "postgresql://neondb_owner:npg_Bsgiv6Ynxjb8@ep-red-leaf-a5wbvtme-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 
 def obter_conexao():
-    conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row 
-    return conn
+    # RealDictCursor faz o Postgres retornar as informações em formato de dicionário para o JSON
+    return psycopg2.connect(DB_URL, cursor_factory=RealDictCursor)
+
+def iniciar_banco():
+    conexao = obter_conexao()
+    cursor = conexao.cursor()
+    
+    # Criação da tabela com colunas idênticas às usadas nas rotas
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS pedidos (
+            id BIGINT PRIMARY KEY,
+            cliente VARCHAR(100),
+            item TEXT,
+            status VARCHAR(20),
+            total REAL
+        )
+    ''')
+    
+    # Criação da tabela de estoque
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS estoque (
+            id BIGINT PRIMARY KEY,
+            nome VARCHAR(100),
+            quantidade REAL,
+            unidade VARCHAR(20)
+        )
+    ''')
+    
+    conexao.commit()
+    cursor.close()
+    conexao.close()

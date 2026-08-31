@@ -1,6 +1,5 @@
 import os
 from flask import Flask, render_template
-# Remova o 'import webview' e a classe 'ApiExportacao'
 
 from database import iniciar_banco, obter_conexao
 from auth import auth_bp
@@ -21,7 +20,6 @@ app.register_blueprint(estoque_bp)
 def index():
     return render_template('index.html')
 
-# --- FINAL DO ARQUIVO MODIFICADO PARA A NUVEM ---
 if __name__ == '__main__':
     # O servidor web vai definir a porta automaticamente aqui:
     porta = int(os.environ.get("PORT", 5000))

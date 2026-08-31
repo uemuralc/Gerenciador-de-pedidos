@@ -5,7 +5,6 @@ from functools import wraps
 auth_bp = Blueprint('auth', __name__)
 SENHA_SISTEMA = "1234"
 
-# Nosso decorador de segurança
 def login_obrigatorio(f):
     @wraps(f)
     def decorador(*args, **kwargs):
