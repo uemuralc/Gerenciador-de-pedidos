@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 banco_de_dados.db
 venv/
+.env

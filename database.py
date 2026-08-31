@@ -1,10 +1,15 @@
+import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from dotenv import load_dotenv
 
-DB_URL = "postgresql://neondb_owner:npg_Bsgiv6Ynxjb8@ep-red-leaf-a5wbvtme-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+# Carrega as variáveis do arquivo .env local
+load_dotenv()
+
+# Puxa a URL de forma segura
+DB_URL = os.getenv("DATABASE_URL")
 
 def obter_conexao():
-    # RealDictCursor faz o Postgres retornar as informações em formato de dicionário para o JSON
     return psycopg2.connect(DB_URL, cursor_factory=RealDictCursor)
 
 def iniciar_banco():
