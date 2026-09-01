@@ -21,3 +21,8 @@ def verificar_login():
         return jsonify({"sucesso": True, "mensagem": "Acesso liberado!"}), 200
     
     return jsonify({"sucesso": False, "erro": "Senha incorreta!"}), 401
+
+@auth_bp.route('/api/logout', methods=['POST'])
+def fazer_logout():
+    session.pop('logado', None) # Remove o acesso da sessão
+    return jsonify({"sucesso": True, "mensagem": "Saiu do modo Admin"})

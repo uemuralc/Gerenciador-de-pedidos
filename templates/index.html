@@ -66,8 +66,14 @@
         <!-- NAVEGAÇÃO -->
         <div class="navbar">
             <button id="btnNovoPedido" class="nav-btn ativo" onclick="mudarAba('novoPedido')">➕ Novo Pedido</button>
-            <button id="btnFilaPedidos" class="nav-btn" onclick="solicitarAba('filaPedidos')">📋 Fila de Pedidos</button>
-            <button id="btnEstoque" class="nav-btn" onclick="solicitarAba('estoque')">🛠️ Estoque</button>
+            
+            <!-- Escondidos por padrão (só admin vê) -->
+            <button id="btnFilaPedidos" class="nav-btn" onclick="mudarAba('filaPedidos')" style="display: none;">📋 Fila de Pedidos</button>
+            <button id="btnEstoque" class="nav-btn" onclick="mudarAba('estoque')" style="display: none;">🛠️ Estoque</button>
+
+            <!-- Botões de Controle Admin -->
+            <button id="btnLoginAdmin" class="nav-btn" onclick="abrirModalAdmin()" style="margin-left: auto; background-color: #ffc107; color: black; font-weight: bold;">🔒 Login Admin</button>
+            <button id="btnSairAdmin" class="nav-btn" onclick="sairAdmin()" style="display: none; margin-left: auto; background-color: #dc3545; font-weight: bold;">🚪 Sair</button>
         </div>
 
         <!-- TELA 1: NOVO PEDIDO -->

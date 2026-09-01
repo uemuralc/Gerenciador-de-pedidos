@@ -33,9 +33,8 @@ function filtrarTabela(inputId, tabelaId) {
     }
 }
 
-// --- SISTEMA DE SENHAS E NAVEGAÇÃO ---
-function solicitarAba(abaDestino) {
-    abaPendente = abaDestino;
+// --- SISTEMA DE SENHAS E NAVEGAÇÃO (MODO ADMIN) ---
+function abrirModalAdmin() {
     document.getElementById('modalSenha').style.display = 'flex';
     document.getElementById('inputSenha').value = '';
     document.getElementById('msgErro').style.display = 'none';
@@ -55,10 +54,15 @@ async function verificarSenha() {
 
         if (resultado.sucesso) {
             fecharModalSenha();
-            executarMudancaAba(abaPendente);
-            mostrarToast(resultado.mensagem, 'sucesso');
+            mostrarToast('Modo Admin ativado!', 'sucesso');
             
-            // Carrega os dados após a permissão ser concedida pelo servidor!
+            // Revela as abas de admin e troca os botões de login/sair
+            document.getElementById('btnFilaPedidos').style.display = 'block';
+            document.getElementById('btnEstoque').style.display = 'block';
+            document.getElementById('btnLoginAdmin').style.display = 'none';
+            document.getElementById('btnSairAdmin').style.display = 'block';
+            
+            // Carrega os dados seguros
             carregarPedidos();
             carregarEstoque();
         } else {
@@ -66,6 +70,47 @@ async function verificarSenha() {
         }
     } catch (e) {
         mostrarToast('Erro ao conectar com o servidor', 'erro');
+    }
+}
+
+async function sairAdmin() {
+    try {
+        await fetch('/api/logout', { method: 'POST' }); // Avisa o servidor para fechar a sessão
+        
+        mudarAba('novoPedido'); // Força a voltar para a tela pública
+        
+        // Esconde as abas de admin novamente
+        document.getElementById('btnFilaPedidos').style.display = 'none';
+        document.getElementById('btnEstoque').style.display = 'none';
+        document.getElementById('btnLoginAdmin').style.display = 'block';
+        document.getElementById('btnSairAdmin').style.display = 'none';
+        
+        mostrarToast('Modo Admin desativado', 'sucesso');
+    } catch (e) {
+        mostrarToast('Erro ao sair', 'erro');
+    }
+}
+
+function fecharModalSenha() { document.getElementById('modalSenha').style.display = 'none'; }
+
+function mudarAba(abaDestino) {
+    // Esconde todas as seções e tira o visual ativo dos botões
+    ['secaoNovoPedido', 'secaoFilaPedidos', 'secaoEstoque'].forEach(id => document.getElementById(id).style.display = 'none');
+    ['btnNovoPedido', 'btnFilaPedidos', 'btnEstoque'].forEach(id => document.getElementById(id).classList.remove('ativo'));
+
+    if (abaDestino === 'novoPedido') {
+        document.getElementById('secaoNovoPedido').style.display = 'block';
+        document.getElementById('btnNovoPedido').classList.add('ativo');
+        setTimeout(() => document.getElementById('clienteNome').focus(), 100);
+    } else if (abaDestino === 'filaPedidos') {
+        document.getElementById('secaoFilaPedidos').style.display = 'block';
+        document.getElementById('conteudoFila').style.display = 'block';
+        document.getElementById('secaoPerfil').style.display = 'none';
+        document.getElementById('btnFilaPedidos').classList.add('ativo');
+    } else if (abaDestino === 'estoque') {
+        document.getElementById('secaoEstoque').style.display = 'block';
+        document.getElementById('btnEstoque').classList.add('ativo');
+        setTimeout(() => document.getElementById('materialNome').focus(), 100);
     }
 }
 
