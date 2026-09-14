@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 from flask import Flask, render_template
 
 from database import iniciar_banco, obter_conexao
@@ -6,9 +7,11 @@ from auth import auth_bp
 from rotas_pedidos import pedidos_bp
 from rotas_estoque import estoque_bp
 
+load_dotenv()
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__, template_folder=os.path.join(BASE_DIR, 'templates'), static_folder=os.path.join(BASE_DIR, 'static'))
-app.secret_key = "chave_super_secreta_painel_gestao_2026"
+app.secret_key = os.getenv("SECRET_KEY")
 
 iniciar_banco()
 

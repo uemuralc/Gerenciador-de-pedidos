@@ -1,9 +1,13 @@
+import os
+from dotenv import load_dotenv
 from flask import Blueprint, request, jsonify, session
 from functools import wraps
 
+load_dotenv()
+
 # Criando o Blueprint de Autenticação
 auth_bp = Blueprint('auth', __name__)
-SENHA_SISTEMA = "1234"
+SENHA_SISTEMA = os.getenv("SENHA_SISTEMA")
 
 def login_obrigatorio(f):
     @wraps(f)
@@ -16,7 +20,7 @@ def login_obrigatorio(f):
 @auth_bp.route('/api/login', methods=['POST'])
 def verificar_login():
     dados = request.json
-    if dados.get('senha', '') == SENHA_SISTEMA:
+    if SENHA_SISTEMA and dados.get('senha', '') == SENHA_SISTEMA:
         session['logado'] = True 
         return jsonify({"sucesso": True, "mensagem": "Acesso liberado!"}), 200
     

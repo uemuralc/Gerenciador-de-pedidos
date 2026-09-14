@@ -33,10 +33,30 @@ th { background-color: #f8f9fa; }
 .btn-cancelar { background-color: #dc3545 !important; }
 .btn-cancelar:hover { background-color: #c82333 !important; }
 .btn-acao { padding: 5px 10px; font-size: 14px; margin: 2px; color: white; border-radius: 4px; border: none; cursor: pointer; height: auto; width: auto !important;}
-.bg-andamento { background-color: #17a2b8; }
-.bg-finalizar { background-color: #007bff; }
-.bg-editar { background-color: #ffc107; color: black; }
-.bg-deletar { background-color: #dc3545; }
+.bg-andamento { 
+    background-color: #17a2b8; /* Cor original */
+}
+.bg-andamento:hover { 
+    background-color: #138496 !important; /* Tom mais escuro da mesma cor ao passar o mouse */
+}
+.bg-finalizar { 
+    background-color: #007bff; /* Cor original */
+}
+.bg-finalizar:hover { 
+    background-color: #0056b3 !important; /* Tom mais escuro da mesma cor ao passar o mouse */
+}
+.bg-editar {
+    background-color: #ffc107; /* Cor original */
+}
+.bg-editar:hover {
+    background-color: #e0a800 !important; /* Tom mais escuro da mesma cor ao passar o mouse */
+}
+.bg-deletar {
+    background-color: #dc3545; /* Cor original */
+}
+.bg-deletar:hover {
+    background-color: #c82333 !important; /* Tom mais escuro da mesma cor ao passar o mouse */
+}
 .btn-qtd { background-color: #6c757d; color: white; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-weight: bold; margin: 0 5px; height: auto; width: auto !important;}
 
 /* Modais */

@@ -1,5 +1,4 @@
 let todosOsPedidos = [];
-let abaPendente = '';
 let pedidoEditandoId = null;
 let materialEditandoId = null;
 
@@ -114,29 +113,6 @@ function mudarAba(abaDestino) {
     }
 }
 
-function fecharModalSenha() { document.getElementById('modalSenha').style.display = 'none'; }
-function mudarAba(abaDestino) { executarMudancaAba(abaDestino); }
-
-function executarMudancaAba(abaDestino) {
-    ['secaoNovoPedido', 'secaoFilaPedidos', 'secaoEstoque'].forEach(id => document.getElementById(id).style.display = 'none');
-    ['btnNovoPedido', 'btnFilaPedidos', 'btnEstoque'].forEach(id => document.getElementById(id).classList.remove('ativo'));
-
-    if (abaDestino === 'novoPedido') {
-        document.getElementById('secaoNovoPedido').style.display = 'block';
-        document.getElementById('btnNovoPedido').classList.add('ativo');
-        setTimeout(() => document.getElementById('clienteNome').focus(), 100);
-    } else if (abaDestino === 'filaPedidos') {
-        document.getElementById('secaoFilaPedidos').style.display = 'block';
-        document.getElementById('conteudoFila').style.display = 'block';
-        document.getElementById('secaoPerfil').style.display = 'none';
-        document.getElementById('btnFilaPedidos').classList.add('ativo');
-    } else if (abaDestino === 'estoque') {
-        document.getElementById('secaoEstoque').style.display = 'block';
-        document.getElementById('btnEstoque').classList.add('ativo');
-        setTimeout(() => document.getElementById('materialNome').focus(), 100);
-    }
-}
-
 // --- CRUD DE PEDIDOS ---
 async function carregarPedidos() {
     try {
@@ -156,11 +132,14 @@ async function carregarPedidos() {
             ? `<button class="btn-acao bg-andamento" data-acao="iniciar" data-id="${p.id}">Iniciar</button>`
             : (p.status === 'Em andamento' ? `<button class="btn-acao bg-finalizar" data-acao="finalizar" data-id="${p.id}">Finalizar</button>` : `<span>✅</span>`);
 
+        // Link de anexo com download forçado
+        let anexoHtml = p.documento_url ? `<a href="${p.documento_url}" target="_blank" title="Ver Documento" style="margin-left: 10px; text-decoration: none; font-size: 18px;">📎</a>` : '';
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${p.id}</td>
             <td class="link-cliente" data-acao="perfil">${escaparHTML(p.cliente)}</td>
-            <td>${escaparHTML(p.item) || 'N/A'}</td>
+            <td>${escaparHTML(p.item) || 'N/A'} ${anexoHtml}</td>
             <td style="color: ${corStatus}; font-weight: bold;">${p.status}</td>
             <td>R$ ${p.total.toFixed(2)}</td>
             <td>
@@ -188,25 +167,47 @@ async function adicionarPedido() {
     const cliente = document.getElementById('clienteNome').value;
     const item = document.getElementById('itemPedido').value;
     const total = document.getElementById('valorTotal').value;
+    const arquivoInput = document.getElementById('arquivoPedido');
+    const arquivo = arquivoInput.files[0];
 
-    if (!cliente || !item || !total) return mostrarToast('Preencha todos os campos!', 'erro');
+    if (!cliente || !item || !total) return mostrarToast('Preencha os campos obrigatórios!', 'erro');
 
-    try {
-        const resposta = await fetch('/api/pedidos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ cliente, item, total }) });
-        if (!resposta.ok) {
-            const erro = await resposta.json();
-            return mostrarToast(erro.erro || 'Erro ao cadastrar pedido', 'erro');
-        }
-    } catch (e) {
-        return mostrarToast('Erro ao conectar com o servidor', 'erro');
+    const formData = new FormData();
+    formData.append('cliente', cliente);
+    formData.append('item', item);
+    formData.append('total', total);
+    if (arquivo) {
+        formData.append('documento', arquivo);
     }
 
-    document.getElementById('clienteNome').value = '';
-    document.getElementById('itemPedido').value = '';
-    document.getElementById('valorTotal').value = '';
-    mostrarToast('Pedido cadastrado!');
-    carregarPedidos();
-    document.getElementById('clienteNome').focus();
+    const btn = document.getElementById('btnCadastrarPedido');
+    btn.innerText = "Enviando... Aguarde";
+    btn.disabled = true;
+
+    try {
+        const resposta = await fetch('/api/pedidos', { 
+            method: 'POST', 
+            body: formData 
+        });
+        
+        if (!resposta.ok) {
+            const erro = await resposta.json();
+            mostrarToast(erro.erro || 'Erro ao cadastrar pedido', 'erro');
+        } else {
+            document.getElementById('clienteNome').value = '';
+            document.getElementById('itemPedido').value = '';
+            document.getElementById('valorTotal').value = '';
+            arquivoInput.value = '';
+            mostrarToast('Pedido cadastrado!');
+            carregarPedidos();
+            document.getElementById('clienteNome').focus();
+        }
+    } catch (e) {
+        mostrarToast('Erro ao conectar com o servidor', 'erro');
+    } finally {
+        btn.innerText = "Cadastrar Pedido";
+        btn.disabled = false;
+    }
 }
 
 async function alterarStatus(id_pedido, status) {
@@ -409,24 +410,54 @@ async function deletarEstoque(id_material) {
 
 // --- CARREGAMENTO INICIAL ---
 window.onload = () => { 
-    // Vazio propositalmente. O carregamento ocorre após a senha.
+    // Vazio propositalmente. O carregamento ocorre após a senha de admin.
 };
 
 // --- SISTEMA DE EXPORTAÇÃO NATIVO (Janela do Windows) ---
 async function exportarPedidos() {
-    let resultado = await window.pywebview.api.exportar_pedidos_nativ();
-    if (resultado.sucesso) {
-        mostrarToast(resultado.msg, 'sucesso');
-    } else if (resultado.msg !== "Cancelado") {
-        mostrarToast("Erro ao exportar", 'erro');
+    try {
+        const resposta = await fetch('/api/pedidos/exportar');
+        if (!resposta.ok) throw new Error();
+        const blob = await resposta.blob();
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = 'pedidos.xlsx';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (e) {
+        mostrarToast('Erro ao exportar', 'erro');
     }
 }
 
 async function exportarEstoque() {
-    let resultado = await window.pywebview.api.exportar_estoque_nativ();
-    if (resultado.sucesso) {
-        mostrarToast(resultado.msg, 'sucesso');
-    } else if (resultado.msg !== "Cancelado") {
-        mostrarToast("Erro ao exportar", 'erro');
+    try {
+        const resposta = await fetch('/api/estoque/exportar');
+        if (!resposta.ok) throw new Error();
+        const blob = await resposta.blob();
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = 'estoque.xlsx';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (e) {
+        mostrarToast('Erro ao exportar', 'erro');
+    }
+}
+
+async function baixarArquivo(url, nomeArquivo) {
+    try {
+        mostrarToast('Baixando arquivo...', 'sucesso');
+        const resposta = await fetch(url);
+        const blob = await resposta.blob();
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = nomeArquivo;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (e) {
+        mostrarToast('Erro ao baixar o arquivo', 'erro');
     }
 }

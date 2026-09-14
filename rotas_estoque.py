@@ -1,6 +1,8 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from datetime import datetime
 from database import obter_conexao
+from io import BytesIO 
+import openpyxl
 
 estoque_bp = Blueprint('estoque', __name__)
 
@@ -49,3 +51,38 @@ def acoes_estoque(id_material):
         cursor.close()
         conn.close()
         return jsonify({"mensagem": "Estoque atualizado!"}), 200
+
+@estoque_bp.route('/api/estoque/exportar', methods=['GET'])
+def exportar_estoque_excel():
+    conn = obter_conexao()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM estoque')
+    estoque = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Estoque"
+
+    ws.append(['ID', 'Material', 'Quantidade', 'Unidade'])
+    for celula in ws[1]:
+        celula.font = openpyxl.styles.Font(bold=True)
+
+    for m in estoque:
+        ws.append([m['id'], m['nome'], m['quantidade'], m['unidade']])
+
+    for coluna in ws.columns:
+        largura = max(len(str(c.value)) for c in coluna if c.value is not None) + 2
+        ws.column_dimensions[coluna[0].column_letter].width = largura
+
+    buffer = BytesIO()
+    wb.save(buffer)
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name='estoque.xlsx',
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )

@@ -79,10 +79,12 @@
         <!-- TELA 1: NOVO PEDIDO -->
         <div id="secaoNovoPedido">
             <h1>Novo Pedido</h1>
-            <div class="form-group"><label>Nome do Cliente:</label><input type="text" id="clienteNome" placeholder="Ex: João Silva" onkeypress="if(event.key === 'Enter') adicionarPedido()"></div>
-            <div class="form-group"><label>Produto/Item Final:</label><input type="text" id="itemPedido" placeholder="Ex: Mesa de Madeira" onkeypress="if(event.key === 'Enter') adicionarPedido()"></div>
-            <div class="form-group"><label>Valor Total (R$):</label><input type="number" id="valorTotal" placeholder="Ex: 850.00" min="0" onkeypress="if(event.key === 'Enter') adicionarPedido()"></div>
-            <button onclick="adicionarPedido()">Cadastrar Pedido</button>
+            <div class="form-group"><label>Nome do Cliente:</label><input type="text" id="clienteNome" placeholder="Ex: João Silva"></div>
+            <div class="form-group"><label>Produto/Item Final:</label><input type="text" id="itemPedido" placeholder="Ex: Mesa de Madeira"></div>
+            <div class="form-group"><label>Valor Total (R$):</label><input type="number" id="valorTotal" placeholder="Ex: 850.00" min="0"></div>
+            <div class="form-group"><label>Anexar Documento (Opcional):</label><input type="file" id="arquivoPedido" accept="image/*, .pdf, .doc, .docx"></div>
+            
+            <button id="btnCadastrarPedido" onclick="adicionarPedido()">Cadastrar Pedido</button>
         </div>
 
         <!-- TELA 2: FILA -->
