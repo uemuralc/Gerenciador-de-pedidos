@@ -109,6 +109,20 @@ button:hover {
     box-shadow: 0 6px 12px rgba(244, 192, 30, 0.3);
 }
 
+button[onclick*="adicionarEstoque"] {
+    width: 100%;
+    margin-top: 15px;
+    background-color: #f4c01e; 
+    color: #111;
+    box-shadow: 0 4px 6px rgba(244, 192, 30, 0.2);
+}
+
+button[onclick*="adicionarEstoque"]:hover {
+    background-color: #e0ac10;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(244, 192, 30, 0.3);
+}
+
 table { width: 100%; border-collapse: collapse; margin-top: 15px; }
 th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
 th { background-color: #f8f9fa; }
@@ -185,8 +199,35 @@ th { background-color: #f8f9fa; }
 .link-cliente { text-decoration: underline; cursor: pointer; font-weight: bold; color: #0b414b;}
 .link-cliente:hover { color: #125c69; }
 .btn-voltar { background-color: #6c757d; margin-bottom: 15px;}
+.btn-voltar:hover {
+    background-color: #4a5157 !important; 
+}
 .btn-cancelar { background-color: #dc3545 !important; color: white !important; }
 .btn-cancelar:hover { background-color: #c82333 !important; }
+
+#btnSairAdmin:hover {
+    background-color: #bd2130 !important;
+}
+
+#btnLoginAdmin:hover {
+    background-color: #d39e00 !important; 
+    color: #111 !important;
+}
+
+.navbar .nav-btn.ativo:hover,
+#btnLoginAdmin:hover {
+    background-color: #e0ac10 !important; /* Um amarelo-ouro bem mais escuro */
+    transform: translateY(-2px); /* Mantém o efeito de levitar */
+}
+
+#btnLoginAdmin, #btnSairAdmin {
+    border: none !important;
+}
+
+.navbar .nav-btn:hover {
+    transform: translateY(-2px);
+    transition: transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
 
 .btn-acao { 
     padding: 6px 12px; 
@@ -235,7 +276,12 @@ th { background-color: #f8f9fa; }
 .toast-erro { background-color: #dc3545 !important; }
 
 button[onclick*="exportar"] { background-color: #1d6f7e !important; }
-button[onclick*="exportar"]:hover { background-color: #125c69 !important; }
+button[onclick*="exportar"]:hover { 
+    background-color: #125c69 !important; 
+    transform: translateY(-2px);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
 
 /* --- ADAPTAÇÃO PARA CELULAR (RESPONSIVIDADE) --- */
 @media (max-width: 768px) {

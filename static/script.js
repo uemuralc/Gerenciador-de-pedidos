@@ -336,10 +336,39 @@ async function salvarEdicaoEstoque() {
 
 async function atualizarQuantidade(id_material, nova_qtd) {
     if (nova_qtd < 0) return;
-    try { await fetch(`/api/estoque/${id_material}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ quantidade: nova_qtd }) }); carregarEstoque();
-    } catch (e) { mostrarToast('Erro ao atualizar quantidade', 'erro'); }
-}
 
+    // 1. Encontra a linha correspondente a este material na tabela e atualiza o número INSTANTANEAMENTE na tela
+    const linhas = document.querySelectorAll('#tabelaEstoque tr');
+    linhas.forEach(tr => {
+        const idCelula = tr.cells[0];
+        if (idCelula && parseInt(idCelula.innerText) === id_material) {
+            // A célula da quantidade é a terceira (índice 2)
+            const tdQtd = tr.cells[2];
+            if (tdQtd) {
+                // Mantém os botões + e - mas atualiza o número no meio
+                const corQtd = nova_qtd <= 5 ? 'red' : 'black';
+                tdQtd.style.color = corQtd;
+                tdQtd.innerHTML = `<button class="btn-qtd" data-acao="menos">-</button> ${nova_qtd} <button class="btn-qtd" data-acao="mais">+</button>`;
+                
+                // Reatribui os eventos de clique para os botões recriados
+                tdQtd.querySelector('[data-acao="menos"]').addEventListener('click', () => atualizarQuantidade(id_material, nova_qtd - 1));
+                tdQtd.querySelector('[data-acao="mais"]').addEventListener('click', () => atualizarQuantidade(id_material, nova_qtd + 1));
+            }
+        }
+    });
+
+    // 2. Envia a alteração para o servidor em segundo plano (sem travar a tela)
+    try { 
+        await fetch(`/api/estoque/${id_material}`, { 
+            method: 'PUT', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ quantidade: nova_qtd }) 
+        });
+    } catch (e) { 
+        mostrarToast('Erro ao atualizar quantidade', 'erro'); 
+        carregarEstoque(); // Se der erro, recarrega o original do servidor
+    }
+}
 async function deletarEstoque(id_material) {
     if (confirm("Deseja remover este material do estoque?")) {
         try { await fetch(`/api/estoque/${id_material}`, { method: 'DELETE' }); mostrarToast('Material removido!', 'erro'); carregarEstoque();
