@@ -1,128 +1,264 @@
-body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; padding: 20px; margin: 0; }
-.container { max-width: 950px; margin: 0 auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-h1, h2 { color: #333; margin-top: 0; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+/* Reset base e fontes */
+body { 
+    font-family: 'Inter', sans-serif; 
+    color: #333;
+    padding: 20px; 
+    margin: 0; 
+    min-height: 100vh;
+}
+
+/* Configura o vídeo para cobrir a tela inteira e ficar fixo lá no fundo */
+#bg-video {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: -2; 
+    transform: translateX(-50%) translateY(-50%); 
+    object-fit: cover; 
+}
+
+/* Película azul-petróleo meio transparente sobre o vídeo */
+.video-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(30, 117, 134, 0.85) 0%, rgba(11, 65, 75, 0.90) 50%, rgba(4, 31, 36, 0.95) 100%);
+    z-index: -1;
+}
+
+.container { 
+    max-width: 950px; 
+    margin: 0 auto; 
+    background: #ffffff; 
+    padding: 40px; 
+    border-radius: 12px; 
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3); /* Sombra um pouco maior para destacar do fundo */
+    margin-top: 30px;
+    position: relative; /* Garante que fique acima do vídeo */
+    z-index: 1;
+}
+
+h1, h2 { color: #0b414b; margin-top: 0; }
 .form-group { margin-bottom: 15px; }
 
-input, select { 
-    padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-top: 5px; 
-    outline: none; box-sizing: border-box; width: 100% !important; height: 42px; font-family: inherit; 
+label {
+    font-weight: 500;
+    font-size: 14px;
+    color: #555;
 }
-input:focus, select:focus { border: 1px solid #000000; }
+
+input, select { 
+    padding: 12px 15px; 
+    border: 1px solid #ced4da; 
+    border-radius: 8px; 
+    margin-top: 5px; 
+    outline: none; 
+    box-sizing: border-box; 
+    width: 100% !important; 
+    height: 45px; 
+    font-family: inherit;
+    font-size: 15px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input:focus, select:focus { 
+    border-color: #0b414b;
+    box-shadow: 0 0 0 3px rgba(11, 65, 75, 0.15);
+}
 
 .barra-busca { margin-bottom: 15px; font-size: 14px; }
-button { padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px; margin-bottom: 25px; }
-button:hover { background-color: #218838; }
+
+button { 
+    padding: 12px 24px; 
+    background-color: #28a745; 
+    color: white; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-size: 16px; 
+    font-weight: 600;
+    margin-top: 10px; 
+    margin-bottom: 25px; 
+    transition: all 0.3s ease;
+}
+
+button:hover { 
+    background-color: #218838; 
+}
+
+/* Botão principal com o Amarelo/Ouro do Oceantec */
+#btnCadastrarPedido {
+    width: 100%;
+    margin-top: 25px;
+    background-color: #f4c01e; 
+    color: #111;
+    box-shadow: 0 4px 6px rgba(244, 192, 30, 0.2);
+}
+
+#btnCadastrarPedido:hover {
+    background-color: #e0ac10;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(244, 192, 30, 0.3);
+}
+
 table { width: 100%; border-collapse: collapse; margin-top: 15px; }
 th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
 th { background-color: #f8f9fa; }
 
-/* Navegação */
-.navbar { display: flex; gap: 10px; margin-bottom: 25px; background-color: #343a40; padding: 15px; border-radius: 8px; }
-.nav-btn { background-color: transparent; color: white; border: 1px solid white; margin: 0; }
+/* Navegação com o azul-petróleo */
+.navbar { 
+    display: flex; 
+    gap: 15px; 
+    margin-bottom: 25px; 
+    background-color: #0b414b; 
+    padding: 15px 20px; 
+    border-radius: 12px;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.nav-btn { 
+    background-color: transparent; 
+    color: white; 
+    border: 1px solid white; 
+    margin: 0; 
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
 .nav-btn:hover { background-color: rgba(255, 255, 255, 0.1); }
-.nav-btn.ativo { background-color: #28a745; border-color: #28a745; font-weight: bold; }
+
+.nav-btn.ativo { 
+    background-color: #f4c01e; 
+    border-color: #f4c01e; 
+    color: #111;
+    font-weight: bold; 
+}
+
+/* --- ESTILOS DOS CARDS (CAIXINHAS COM ETIQUETAS) --- */
+.form-section {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 30px 20px 20px;
+    margin-top: 35px; 
+    position: relative;
+    background-color: #ffffff;
+}
+
+.section-badge {
+    background-color: #0b414b; 
+    color: white;
+    padding: 6px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    position: absolute;
+    top: -14px; 
+    left: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-row .form-group {
+    flex: 1; 
+    margin-bottom: 0;
+}
 
 /* Telas */
 #secaoPerfil, #secaoFilaPedidos, #secaoEstoque { display: none; }
-#secaoPerfil { background-color: #e9ecef; padding: 20px; border-radius: 8px; }
+#secaoPerfil { background-color: #e9ecef; padding: 20px; border-radius: 8px; margin-top: 20px; }
 
 /* Botões Especiais */
-.link-cliente { text-decoration: underline; cursor: pointer; font-weight: bold; color: #000000;}
-.link-cliente:hover { color: #555555; }
+.link-cliente { text-decoration: underline; cursor: pointer; font-weight: bold; color: #0b414b;}
+.link-cliente:hover { color: #125c69; }
 .btn-voltar { background-color: #6c757d; margin-bottom: 15px;}
-.btn-cancelar { background-color: #dc3545 !important; }
+.btn-cancelar { background-color: #dc3545 !important; color: white !important; }
 .btn-cancelar:hover { background-color: #c82333 !important; }
-.btn-acao { padding: 5px 10px; font-size: 14px; margin: 2px; color: white; border-radius: 4px; border: none; cursor: pointer; height: auto; width: auto !important;}
-.bg-andamento { 
-    background-color: #17a2b8; /* Cor original */
+
+.btn-acao { 
+    padding: 6px 12px; 
+    font-size: 14px; 
+    margin: 2px; 
+    color: white; 
+    border-radius: 6px; 
+    border: none; 
+    cursor: pointer; 
+    height: auto; 
+    width: auto !important;
+    font-weight: 500;
 }
-.bg-andamento:hover { 
-    background-color: #138496 !important; /* Tom mais escuro da mesma cor ao passar o mouse */
+
+.bg-andamento { background-color: #17a2b8; }
+.bg-andamento:hover { background-color: #138496 !important; }
+.bg-finalizar { background-color: #007bff; }
+.bg-finalizar:hover { background-color: #0056b3 !important; }
+.bg-editar { background-color: #f4c01e; color: black; }
+.bg-editar:hover { background-color: #e0ac10 !important; }
+.bg-deletar { background-color: #dc3545; }
+.bg-deletar:hover { background-color: #c82333 !important; }
+
+.btn-qtd { 
+    background-color: #6c757d; 
+    color: white; 
+    border: none; 
+    border-radius: 4px; 
+    padding: 4px 10px; 
+    cursor: pointer; 
+    font-weight: bold; 
+    margin: 0 5px; 
+    height: auto; 
+    width: auto !important;
 }
-.bg-finalizar { 
-    background-color: #007bff; /* Cor original */
-}
-.bg-finalizar:hover { 
-    background-color: #0056b3 !important; /* Tom mais escuro da mesma cor ao passar o mouse */
-}
-.bg-editar {
-    background-color: #ffc107; /* Cor original */
-}
-.bg-editar:hover {
-    background-color: #e0a800 !important; /* Tom mais escuro da mesma cor ao passar o mouse */
-}
-.bg-deletar {
-    background-color: #dc3545; /* Cor original */
-}
-.bg-deletar:hover {
-    background-color: #c82333 !important; /* Tom mais escuro da mesma cor ao passar o mouse */
-}
-.btn-qtd { background-color: #6c757d; color: white; border: none; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-weight: bold; margin: 0 5px; height: auto; width: auto !important;}
 
 /* Modais */
 .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); z-index: 1000; justify-content: center; align-items: center; }
-.modal-content { background-color: white; padding: 30px; border-radius: 8px; width: 350px; text-align: center; }
+.modal-content { background-color: white; padding: 30px; border-radius: 12px; width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
 .modal-content label { text-align: left; display: block; font-weight: bold; margin-bottom: 5px; margin-top: 10px; }
 
 /* Toasts */
-#toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 5px; padding: 16px; position: fixed; z-index: 9999; left: 50%; transform: translateX(-50%); bottom: 30px; font-size: 17px; box-shadow: 0px 4px 6px rgba(0,0,0,0.2); transition: visibility 0.5s, opacity 0.5s ease-in-out; opacity: 0; }
+#toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 16px; position: fixed; z-index: 9999; left: 50%; transform: translateX(-50%); bottom: 30px; font-size: 16px; font-weight: 500; box-shadow: 0px 4px 12px rgba(0,0,0,0.15); transition: visibility 0.5s, opacity 0.5s ease-in-out; opacity: 0; }
 #toast.mostrar { visibility: visible; opacity: 1; }
 .toast-sucesso { background-color: #28a745 !important; }
 .toast-erro { background-color: #dc3545 !important; }
 
-button[onclick*="exportar"] {
-    background-color: #17a2b8 !important;
-}
-
-button[onclick*="exportar"]:hover {
-    background-color: #138496 !important;
-}
+button[onclick*="exportar"] { background-color: #1d6f7e !important; }
+button[onclick*="exportar"]:hover { background-color: #125c69 !important; }
 
 /* --- ADAPTAÇÃO PARA CELULAR (RESPONSIVIDADE) --- */
 @media (max-width: 768px) {
-    body { 
-        padding: 10px; 
-    }
+    body { padding: 10px; }
     .container { 
-        padding: 15px; 
+        padding: 20px; 
+        margin-top: 10px;
     }
     
-    /* Empilha os botões do menu no celular */
-    .navbar { 
-        flex-direction: column; 
-        gap: 5px;
-    }
-    .nav-btn { 
-        width: 100%; 
-        margin-bottom: 5px; 
-    }
-    
-    /* Permite rolar a tabela para o lado com o dedo */
-    table { 
-        display: block; 
-        overflow-x: auto; 
-        white-space: nowrap; 
-    }
-    
-    /* Ajusta modais para telas pequenas */
-    .modal-content {
-        width: 90%;
-        padding: 20px;
-    }
-}
+    table { display: block; overflow-x: auto; white-space: nowrap; }
+    .modal-content { width: 90%; padding: 20px; }
+    .form-row { flex-direction: column; gap: 15px; }
 
-/* --- CORREÇÃO DO MENU NO CELULAR --- */
-@media (max-width: 768px) {
     .navbar {
         display: flex;
-        flex-wrap: wrap; /* Permite que os botões quebrem linha se faltar espaço */
+        flex-wrap: wrap; 
         gap: 8px;
         justify-content: center;
         padding: 10px;
     }
 
     .nav-btn {
-        flex: 1 1 30%; /* Faz os botões dividirem o espaço de forma inteligente */
+        flex: 1 1 30%; 
         min-width: 90px;
         font-size: 13px;
         padding: 8px 4px;
